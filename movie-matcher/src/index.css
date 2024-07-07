@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  font-family: "Roboto", sans-serif; /* Futuristic font */
+  background: linear-gradient(
+    to right,
+    #0f0c29,
+    #302b63,
+    #24243e
+  ); /* Sleek gradient background */
+  color: #e0e0e0; /* Light text for dark background */
+}
+
+code {
+  font-family: "Consolas", "Courier New", monospace;
+}

@@ -1,0 +1,42 @@
+/* Import the font */
+@import url("https://fonts.googleapis.com/css2?family=Orbitron&display=swap");
+
+/* Global page styles */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(145deg, #1f1f2e, #484850);
+  font-family: "Roboto", sans-serif;
+  color: #dcdcdc;
+}
+
+/* Logo styles */
+.logo-container h1 {
+  font-family: "Orbitron", sans-serif; /* Futuristic font */
+  color: #e0e0e0;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Form styles */
+.login-form {
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+  border-radius: 10px;
+  padding: 20px;
+  width: 300px;
+  max-width: 80%;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background: #ffffff20; /* Slightly transparent input fields */
+  color: #e0e0e0;
+}
