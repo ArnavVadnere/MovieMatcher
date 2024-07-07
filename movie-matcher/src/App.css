@@ -2,11 +2,6 @@
   text-align: center;
 }
 
-.App-header {
-  background-color: transparent; /* Make header transparent to show the gradient */
-  color: #e0e0e0; /* Light text for readability */
-}
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
