@@ -4,18 +4,16 @@
   "private": true,
   "dependencies": {
     "@aws-amplify/auth": "^6.10.1",
-    "@aws-amplify/core": "^6.9.2",
+    "@aws-amplify/ui-react": "^6.9.1",
+    "@react-spring/web": "^9.5.5",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "aws-amplify": "^6.12.2",
-    "oidc-client-ts": "^3.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-oidc-context": "^3.2.0",
     "react-router-dom": "^6.24.1",
     "react-scripts": "5.0.1",
-    "react-spring": "^9.7.5",
     "react-tinder-card": "^1.6.4",
     "tailwind": "^4.0.0",
     "web-vitals": "^2.1.4"
@@ -45,7 +43,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4"
