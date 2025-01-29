@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-moviematcher-dev-afef5-authRole",
+      "UnauthRoleArn": "arn:aws:iam::482056298268:role/amplify-moviematcher-dev-afef5-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::482056298268:role/amplify-moviematcher-dev-afef5-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
+      "UnauthRoleName": "amplify-moviematcher-dev-afef5-unauthRole",
+      "StackName": "amplify-moviematcher-dev-afef5",
+      "StackId": "arn:aws:cloudformation:us-east-2:482056298268:stack/amplify-moviematcher-dev-afef5/4a6f2500-dd43-11ef-b3cc-06e050e45793",
+      "AmplifyAppId": "d1fzx9t81jry9o"
+    },
+    "categories": {
+      "auth": {
+        "moviematchera5c29dcc": {}
+      }
+    }
+  }
+}
