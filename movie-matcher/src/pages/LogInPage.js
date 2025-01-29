@@ -32,52 +32,65 @@ const LogInPage = () => {
   }, [navigate]);
 
 
+
   const handleLogin = async () => {
     console.log("🔄 Attempting login...");
 
     try {
-      console.log("🔹 Signing in user:", email);
-      const user = await signIn({ username: email, password });
-      console.log("✅ Login successful:", user);
+        console.log("🔹 Signing in user:", email);
+        const user = await signIn({ username: email, password });
+        console.log("✅ Login successful:", user);
 
-      // ✅ Fetch user attributes
-      console.log("🔹 Fetching user session...");
-      const session = await fetchAuthSession();
-      console.log("✅ User session retrieved:", session);
+        // ✅ Fetch user session
+        console.log("🔹 Fetching user session...");
+        const session = await fetchAuthSession();
+        console.log("✅ User session retrieved:", session);
 
-      // ✅ Extract user attributes from ID Token
-      const idToken = session.tokens.idToken;
-      const claims = idToken.payload;
-      console.log("✅ Extracted user attributes:", claims);
+        // ✅ Extract user attributes from ID Token
+        const idToken = session.tokens.idToken;
+        const claims = idToken.payload;
+        console.log("✅ Extracted user attributes:", claims);
 
-      const isFirstLogin = claims["custom:firstLoginReal"] || "true";
-      console.log("🔹 Is first login?", isFirstLogin);
+        const isFirstLogin = claims["custom:firstLoginReal"] || "true";
+        console.log("🔹 Is first login?", isFirstLogin);
 
-      if (isFirstLogin === "true") {
-        try {
-          console.log("🔹 Updating first login status...");
-
-          // ✅ Call Cognito API directly or refresh session attributes
-          await fetchAuthSession(); // Refresh session after update
-          console.log("✅ First login flag updated successfully.");
-
-          navigate("/preferences");
-          console.log("➡️ Redirecting to Preferences page...");
-        } catch (updateError) {
-          console.error("❌ Error updating first login flag:", updateError);
-          setErrorMessage("Error updating user attributes.");
-          console.log("🔄 User signed out due to update failure.");
-          return;
+        if (isFirstLogin === "true") {
+          try {
+            const user = await getCurrentUser();
+          
+            if (user) { 
+              console.log("🔹 Updating first login status...");
+              console.log("User Object:", user); // Add this line for debugging
+          
+              // Check for potential issues within the user object
+              if (user) { 
+                // Ensure user.attributes is not null or undefined
+                await updateUserAttributes({
+                  "custom:firstLoginReal": "false"
+                });
+                console.log("✅ First login flag updated successfully.");
+                navigate("/preferences");
+              } else {
+                console.error("⚠️ User object or attributes are missing."); 
+              }
+            } else {
+              console.log("⚠️ No user found. Skipping update.");
+            }
+          } catch (error) {
+            console.error("❌ Error getting current user:", error);
+            // Handle errors appropriately
+          }
+        } else {
+            navigate("/");
+            console.log("➡️ Redirecting to Home page...");
         }
-      } else {
-        navigate("/");
-        console.log("➡️ Redirecting to Home page...");
-      }
     } catch (error) {
-      console.error("❌ Login error:", error);
-      setErrorMessage(error.message || "Login failed. Please check your credentials.");
+        console.error("❌ Login error:", error);
+        setErrorMessage(error.message || "Login failed. Please check your credentials.");
     }
-  };
+};
+
+  
 
   
   
