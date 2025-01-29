@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import { signUp, confirmSignUp, getCurrentUser } from "@aws-amplify/auth";
 import { Amplify } from "aws-amplify";
 import awsExports from "../aws-exports"; // Adjust path if necessary
+import Header from "../components/Header"; 
 
 Amplify.configure(awsExports);
 
@@ -79,9 +80,7 @@ const SignUpPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-900 to-indigo-800 text-white">
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold mb-4">MovieMatcher Logo</h1>
-      </div>
+      <Header />
       <div className="w-full max-w-md bg-white bg-opacity-10 rounded-lg p-8 shadow-lg">
         <h2 className="text-2xl mb-4 text-center">Sign Up</h2>
 

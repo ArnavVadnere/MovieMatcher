@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signIn, resetPassword, fetchUserAttributes, updateUserAttributes, getCurrentUser, fetchAuthSession } from "@aws-amplify/auth"; 
+import { signIn, resetPassword, updateUserAttribute, getCurrentUser, fetchAuthSession } from "@aws-amplify/auth"; 
 import { Amplify } from "aws-amplify";
 import awsExports from "../aws-exports"; 
+import Header from "../components/Header"; 
 
 
 Amplify.configure(awsExports);
@@ -33,7 +34,7 @@ const LogInPage = () => {
 
 
 
-  const handleLogin = async () => {
+const handleLogin = async () => {
     console.log("🔄 Attempting login...");
 
     try {
@@ -55,31 +56,28 @@ const LogInPage = () => {
         console.log("🔹 Is first login?", isFirstLogin);
 
         if (isFirstLogin === "true") {
-          try {
-            const user = await getCurrentUser();
-          
-            if (user) { 
-              console.log("🔹 Updating first login status...");
-              console.log("User Object:", user); // Add this line for debugging
-          
-              // Check for potential issues within the user object
-              if (user) { 
-                // Ensure user.attributes is not null or undefined
-                await updateUserAttributes({
-                  "custom:firstLoginReal": "false"
+            try {
+                console.log("🔹 Updating first login status...");
+
+                // ✅ Update the custom attribute using updateUserAttribute()
+                const output = await updateUserAttribute({
+                    userAttribute: {
+                        attributeKey: "custom:firstLoginReal",
+                        value: "false"
+                    }
                 });
-                console.log("✅ First login flag updated successfully.");
+
+                console.log("✅ Update Response:", output);
+                handleUpdateUserAttributeNextSteps(output);
+
                 navigate("/preferences");
-              } else {
-                console.error("⚠️ User object or attributes are missing."); 
-              }
-            } else {
-              console.log("⚠️ No user found. Skipping update.");
+                console.log("➡️ Redirecting to Preferences page...");
+            } catch (updateError) {
+                console.error("❌ Error updating first login flag:", updateError);
+                setErrorMessage("Error updating user attributes.");
+                console.log("🔄 User signed out due to update failure.");
+                return;
             }
-          } catch (error) {
-            console.error("❌ Error getting current user:", error);
-            // Handle errors appropriately
-          }
         } else {
             navigate("/");
             console.log("➡️ Redirecting to Home page...");
@@ -89,6 +87,24 @@ const LogInPage = () => {
         setErrorMessage(error.message || "Login failed. Please check your credentials.");
     }
 };
+
+// ✅ Handle different update steps (e.g., if a confirmation code is needed)
+function handleUpdateUserAttributeNextSteps(output) {
+    const { nextStep } = output;
+
+    switch (nextStep.updateAttributeStep) {
+        case "CONFIRM_ATTRIBUTE_WITH_CODE":
+            console.log(`Confirmation code was sent to ${nextStep.codeDeliveryDetails?.deliveryMedium}.`);
+            // Handle code confirmation if necessary.
+            break;
+        case "DONE":
+            console.log("✅ Attribute was successfully updated.");
+            break;
+        default:
+            console.log("❓ Unknown update step:", nextStep);
+    }
+}
+
 
   
 
@@ -107,9 +123,7 @@ const LogInPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-900 to-indigo-800 text-white">
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold mb-4">MovieMatcher Logo</h1>
-      </div>
+      <Header />
 
       <div className="w-full max-w-xs bg-white bg-opacity-10 rounded-lg p-8 shadow-lg">
         <h2 className="text-2xl mb-4 text-center">Log In</h2>
