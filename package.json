@@ -8,4 +8,5 @@
   "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,md,yml}'",
   "format:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx,json,md,yml}'"
 }
+
 }
