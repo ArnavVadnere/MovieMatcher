@@ -2,5 +2,10 @@
   "dependencies": {
     "oidc-client-ts": "^3.1.0",
     "react-oidc-context": "^3.2.0"
-  }
+  },
+  "scripts": {
+  "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+  "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,md,yml}'",
+  "format:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx,json,md,yml}'"
+}
 }
