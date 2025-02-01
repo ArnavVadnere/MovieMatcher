@@ -1,0 +1,10 @@
+{
+  "resourceName": "movieMatcherStorage",
+  "tableName": "RoomsTable",
+  "partitionKey": {
+    "fieldName": "roomId",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

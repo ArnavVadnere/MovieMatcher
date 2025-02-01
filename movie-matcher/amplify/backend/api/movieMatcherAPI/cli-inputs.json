@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "paths": {
+    "/create-room": {
+      "name": "/create-room",
+      "lambdaFunction": "createRoom",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/join-room": {
+      "name": "/join-room",
+      "lambdaFunction": "joinRoom",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}
