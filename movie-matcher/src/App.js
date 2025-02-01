@@ -69,7 +69,7 @@ function MainLayout() {
           }
         />
         <Route
-          path="/room"
+          path="/room/:roomId"
           element={
             <ProtectedRoute>
               <RoomPage />

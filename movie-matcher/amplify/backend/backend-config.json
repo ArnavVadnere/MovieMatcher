@@ -1,4 +1,28 @@
 {
+  "api": {
+    "movieMatcherAPI": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "createRoom"
+        },
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "joinRoom"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
   "auth": {
     "moviematchera5c29dcc": {
       "customAuth": false,
@@ -25,6 +49,58 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    }
+  },
+  "function": {
+    "createRoom": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "joinRoom": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_createRoom_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createRoom"
+        }
+      ]
+    },
+    "AMPLIFY_function_createRoom_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createRoom"
+        }
+      ]
+    },
+    "AMPLIFY_function_joinRoom_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "joinRoom"
+        }
+      ]
+    },
+    "AMPLIFY_function_joinRoom_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "joinRoom"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "movieMatcherStorage": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
     }
   }
 }

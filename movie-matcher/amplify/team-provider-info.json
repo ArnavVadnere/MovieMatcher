@@ -14,6 +14,22 @@
     "categories": {
       "auth": {
         "moviematchera5c29dcc": {}
+      },
+      "function": {
+        "createRoom": {
+          "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
+          "s3Key": "amplify-builds/createRoom-324e42316733564a4d46-build.zip"
+        },
+        "joinRoom": {
+          "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
+          "s3Key": "amplify-builds/joinRoom-54526e6a2f7a466d5178-build.zip"
+        }
+      },
+      "api": {
+        "movieMatcherAPI": {}
+      },
+      "storage": {
+        "movieMatcherStorage": {}
       }
     }
   }
