@@ -19,10 +19,14 @@ const checkRoomExists = async (roomId) => {
 
 exports.handler = async (event) => {
   try {
-    const { username, userId, maxUsers, genreFilter, streamingService } = JSON.parse(event.body);
+    const { username, userId, maxUsers, genreFilter, streamingService } =
+      JSON.parse(event.body);
     const members = []; // Initialize members as an empty array
     if (!userId || !maxUsers) {
-      return { statusCode: 400, body: JSON.stringify({ error: "Missing required fields" }) };
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing required fields" }),
+      };
     }
 
     let roomId;
@@ -35,13 +39,13 @@ exports.handler = async (event) => {
       Item: {
         roomId,
         hostId: {
-          userId,    // the unique identifier
-          username,  // the user's name
+          userId, // the unique identifier
+          username, // the user's name
         },
         maxUsers,
         genreFilter,
         streamingService,
-        members,
+        members: [username], // Add the host to the members array
         createdAt: new Date().toISOString(),
       },
     };
@@ -49,14 +53,20 @@ exports.handler = async (event) => {
     await dynamo.put(params).promise();
     return {
       statusCode: 200,
-      headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ roomId }),
     };
   } catch (error) {
     console.error("Lambda error:", error);
     return {
       statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ error: error.message }),
     };
   }

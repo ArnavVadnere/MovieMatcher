@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { fetchAuthSession } from "@aws-amplify/auth";
 
-const API_BASE_URL = "https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/joinRoom-dev";
+const API_BASE_URL =
+  "https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/joinRoom-dev";
 
 const RoomsPage = () => {
   const { roomId } = useParams();
@@ -18,7 +19,9 @@ const RoomsPage = () => {
         const claims = idToken.payload;
         const username = claims["custom:userID"] || "User";
 
-        const response = await fetch(`${API_BASE_URL}?roomId=${roomId}&username=${username}`);
+        const response = await fetch(
+          `${API_BASE_URL}?roomId=${roomId}&username=${username}`
+        );
         console.log("Response status:", response.status);
 
         if (!response.ok) {
