@@ -18,11 +18,11 @@
       "function": {
         "createRoom": {
           "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
-          "s3Key": "amplify-builds/createRoom-324e42316733564a4d46-build.zip"
+          "s3Key": "amplify-builds/createRoom-664d546762444b595430-build.zip"
         },
         "joinRoom": {
           "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
-          "s3Key": "amplify-builds/joinRoom-54526e6a2f7a466d5178-build.zip"
+          "s3Key": "amplify-builds/joinRoom-48613261414b6c493653-build.zip"
         }
       },
       "api": {

@@ -8,6 +8,10 @@
     "@types/aws-lambda": "^8.10.92"
   },
   "dependencies": {
-    "aws-sdk": "^2.1692.0"
+    "@aws-amplify/api": "^6.2.2",
+    "@aws-amplify/api-graphql": "^4.7.2",
+    "aws-sdk": "^2.1692.0",
+    "graphql-request": "^7.1.2",
+    "node-fetch": "^3.3.2"
   }
 }

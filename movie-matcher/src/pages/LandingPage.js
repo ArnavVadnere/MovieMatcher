@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { getCurrentUser, fetchAuthSession } from "@aws-amplify/auth";
 import Header from "../components/Header";
 
-const API_BASE_URL = "https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/joinRoom-dev"; // ✅ Replace with your actual API Gateway URL
+const API_BASE_URL =
+  "https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/joinRoom-dev"; // ✅ Replace with your actual API Gateway URL
 
 const LandingPage = () => {
   const [user, setUser] = useState(null);
@@ -37,7 +38,9 @@ const LandingPage = () => {
       const session = await fetchAuthSession(); // ✅ Fetch broader user session
       const claims = session.tokens.idToken.payload; // ✅ Claims contain user attributes
       const username = claims["custom:userID"] || "UnknownUser";
-      const response = await fetch(`{API_BASE_URL}?roomId=${roomCode}&username=${username}`);
+      const response = await fetch(
+        `${API_BASE_URL}?roomId=${roomCode}&username=${username}`
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -48,7 +51,9 @@ const LandingPage = () => {
       navigate(`/room/${roomCode}`); // ✅ Redirect to room page
     } catch (error) {
       console.error("❌ Error joining room:", error);
-      setErrorMessage(error.message || "An error occurred while joining the room.");
+      setErrorMessage(
+        error.message || "An error occurred while joining the room."
+      );
     }
   };
 
@@ -56,7 +61,9 @@ const LandingPage = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-900 to-indigo-800 text-white">
       <div className="mb-8 text-center">
         <Header />
-        <h2 className="text-2xl">Find the perfect movie to watch with your friends!</h2>
+        <h2 className="text-2xl">
+          Find the perfect movie to watch with your friends!
+        </h2>
       </div>
 
       {user ? (
@@ -91,7 +98,9 @@ const LandingPage = () => {
       ) : (
         // ❌ Show "Login or Signup" message if user is NOT logged in
         <div className="w-full max-w-screen-sm bg-white bg-opacity-10 rounded-lg p-8 shadow-lg text-center">
-          <p className="text-lg mb-6">You must log in or sign up to access the app!</p>
+          <p className="text-lg mb-6">
+            You must log in or sign up to access the app!
+          </p>
           <div className="flex flex-col space-y-4">
             <Link
               to="/login"
