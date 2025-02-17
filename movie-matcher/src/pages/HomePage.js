@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { generateClient } from "aws-amplify/api";
 import Header from "../components/Header";
 import { getCurrentUser, fetchAuthSession } from "@aws-amplify/auth";
 import { GENRES, STREAMING_SERVICES } from "../constants";
+import { customCreateRoom } from "../graphql/mutations"; // Import the GraphQL mutation
 
 const HomePage = () => {
+  const client = generateClient();
   const navigate = useNavigate();
   const [roomSettings, setRoomSettings] = useState({
     maxUsers: 4,
@@ -14,36 +17,38 @@ const HomePage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleCreateRoom = async () => {
-    setErrorMessage(""); // Reset error before request
+    setErrorMessage("");
     const user = await getCurrentUser();
 
-    
     try {
-      const session = await fetchAuthSession(); // ✅ Fetch broader user session
-      const claims = session.tokens.idToken.payload; // ✅ Claims contain user attributes
+      const session = await fetchAuthSession();
+      const claims = session.tokens.idToken.payload;
       const username = claims["custom:userID"] || "UnknownUser";
 
+      const input = {
+        ...roomSettings,
+        userId: user.username,
+        username: username,
+      };
 
-
-      const response = await fetch("https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/createRoom-dev", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...roomSettings,
-          userId: user.username,
-          username: username,
-        }),
+      const response = await client.graphql({
+        query: customCreateRoom,
+        variables: {
+          input: {
+            hostUsername: username,
+            hostId: user.username,
+            maxUsers: roomSettings.maxUsers,
+            genreFilter: roomSettings.genreFilter,
+            streamingService: roomSettings.streamingService,
+          },
+        },
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create room");
-      }
 
-      const data = await response.json();
+      const data = response.data.customCreateRoom;
       console.log("Room Created:", data);
-      navigate(`/room/${data.roomId}`);
+      navigate(`/room/${data.id}`);
     } catch (error) {
+      console.log(error);
       console.error("Error creating room:", error);
       setErrorMessage(error.message || "An unexpected error occurred.");
     }
@@ -54,12 +59,18 @@ const HomePage = () => {
       <Header />
       <section className="w-full max-w-2xl bg-white bg-opacity-10 rounded-lg p-8 shadow-lg text-center">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-6 text-white">Set Up Your Room</h2>
+          <h2 className="text-3xl font-bold mb-6 text-white">
+            Set Up Your Room
+          </h2>
           <div className="mb-6">
-            <label className="block text-lg mb-2 text-gray-200">Max Users:</label>
+            <label className="block text-lg mb-2 text-gray-200">
+              Max Users:
+            </label>
             <select
               value={roomSettings.maxUsers}
-              onChange={(e) => setRoomSettings({ ...roomSettings, maxUsers: e.target.value })}
+              onChange={(e) =>
+                setRoomSettings({ ...roomSettings, maxUsers: e.target.value })
+              }
               className="w-full p-3 rounded-lg bg-purple-700 bg-opacity-50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {[2, 4, 6, 8, 10].map((num) => (
@@ -70,18 +81,28 @@ const HomePage = () => {
             </select>
           </div>
           <fieldset className="mb-6">
-            <legend className="text-lg mb-2 text-gray-200">Filter by Genre:</legend>
+            <legend className="text-lg mb-2 text-gray-200">
+              Filter by Genre:
+            </legend>
             <div className="grid grid-cols-2 gap-3">
               {GENRES.map((genre) => (
-                <label key={genre} className="flex items-center bg-white bg-opacity-20 p-2 rounded-lg hover:bg-opacity-30 cursor-pointer">
+                <label
+                  key={genre}
+                  className="flex items-center bg-white bg-opacity-20 p-2 rounded-lg hover:bg-opacity-30 cursor-pointer"
+                >
                   <input
                     type="checkbox"
                     value={genre}
                     onChange={(e) => {
-                      const selectedGenres = roomSettings.genreFilter.includes(genre)
+                      const selectedGenres = roomSettings.genreFilter.includes(
+                        genre
+                      )
                         ? roomSettings.genreFilter.filter((g) => g !== genre)
                         : [...roomSettings.genreFilter, genre];
-                      setRoomSettings({ ...roomSettings, genreFilter: selectedGenres });
+                      setRoomSettings({
+                        ...roomSettings,
+                        genreFilter: selectedGenres,
+                      });
                     }}
                     className="mr-2"
                   />
@@ -91,13 +112,22 @@ const HomePage = () => {
             </div>
           </fieldset>
           <div className="mb-6">
-            <label className="block text-lg mb-2 text-gray-200">Preferred Streaming Service:</label>
+            <label className="block text-lg mb-2 text-gray-200">
+              Preferred Streaming Service:
+            </label>
             <select
               value={roomSettings.streamingService}
-              onChange={(e) => setRoomSettings({ ...roomSettings, streamingService: e.target.value })}
+              onChange={(e) =>
+                setRoomSettings({
+                  ...roomSettings,
+                  streamingService: e.target.value,
+                })
+              }
               className="w-full p-3 rounded-lg bg-purple-700 bg-opacity-50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="" className="text-black">Select a Service</option>
+              <option value="" className="text-black">
+                Select a Service
+              </option>
               {STREAMING_SERVICES.map((service) => (
                 <option key={service} value={service} className="text-black">
                   {service}
@@ -112,9 +142,7 @@ const HomePage = () => {
             Create Room
           </button>
           {errorMessage && (
-            <p className="mt-4 text-red-500 font-bold">
-              {errorMessage}
-            </p>
+            <p className="mt-4 text-red-500 font-bold">{errorMessage}</p>
           )}
         </div>
       </section>

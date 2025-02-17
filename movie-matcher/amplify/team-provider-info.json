@@ -23,10 +23,15 @@
         "joinRoom": {
           "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
           "s3Key": "amplify-builds/joinRoom-48613261414b6c493653-build.zip"
+        },
+        "createRoomGraphQL": {
+          "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
+          "s3Key": "amplify-builds/createRoomGraphQL-54765868513157782b72-build.zip"
         }
       },
       "api": {
-        "movieMatcherAPI": {}
+        "movieMatcherAPI": {},
+        "movieMatcherGraphQL": {}
       },
       "storage": {
         "movieMatcherStorage": {}

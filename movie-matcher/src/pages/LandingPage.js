@@ -4,7 +4,7 @@ import { getCurrentUser, fetchAuthSession } from "@aws-amplify/auth";
 import Header from "../components/Header";
 
 const API_BASE_URL =
-  "https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/joinRoom-dev"; // ✅ Replace with your actual API Gateway URL
+  "https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/joinRoom-dev";
 
 const LandingPage = () => {
   const [user, setUser] = useState(null);

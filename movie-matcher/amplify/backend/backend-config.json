@@ -21,6 +21,30 @@
       ],
       "providerPlugin": "awscloudformation",
       "service": "API Gateway"
+    },
+    "movieMatcherGraphQL": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "moviematchera5c29dcc"
+        }
+      ],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [],
+          "defaultAuthentication": {
+            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+            "userPoolConfig": {
+              "userPoolId": "authmoviematchera5c29dcc"
+            }
+          }
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
     }
   },
   "auth": {
@@ -57,6 +81,12 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "createRoomGraphQL": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "joinRoom": {
       "build": true,
       "dependsOn": [],
@@ -65,6 +95,22 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_createRoomGraphQL_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createRoomGraphQL"
+        }
+      ]
+    },
+    "AMPLIFY_function_createRoomGraphQL_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createRoomGraphQL"
+        }
+      ]
+    },
     "AMPLIFY_function_createRoom_deploymentBucketName": {
       "usedBy": [
         {

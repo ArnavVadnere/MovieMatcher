@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { API, graphqlOperation } from "aws-amplify";
 import Header from "../components/Header";
 import { fetchAuthSession } from "@aws-amplify/auth";
+import { createRoom } from "../graphql/mutations";
 
 const API_BASE_URL =
   "https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/joinRoom-dev";

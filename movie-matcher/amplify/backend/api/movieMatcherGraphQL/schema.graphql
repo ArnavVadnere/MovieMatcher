@@ -1,0 +1,48 @@
+type Room
+  @model
+  @auth(
+    rules: [
+      {
+        allow: owner
+        provider: userPools
+        operations: [create, read, update, delete]
+      } # Public users can create rooms
+    ]
+  ) {
+  id: ID!
+  hostId: String! # store the host's userId
+  hostUsername: String! # store the host's username
+  maxUsers: Int!
+  genreFilter: [String]
+  streamingService: String
+  members: [String!]
+  roomCode: String
+  createdAt: AWSDateTime
+}
+
+input CustomCreateRoomInput {
+  id: ID
+  hostId: String!
+  hostUsername: String!
+  maxUsers: Int!
+  genreFilter: [String]
+  streamingService: String
+  members: [String]
+  roomCode: String
+  createdAt: AWSDateTime
+}
+
+input JoinRoomInput {
+  roomId: ID!
+  username: String!
+}
+
+type Mutation {
+  customCreateRoom(input: CustomCreateRoomInput!): Room
+    @function(name: "createRoomGraphQL-${env}")
+  joinRoom(input: JoinRoomInput!): Room
+}
+
+schema {
+  mutation: Mutation
+}
