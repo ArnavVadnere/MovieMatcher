@@ -35,27 +35,30 @@ const LandingPage = () => {
 
     try {
       const session = await fetchAuthSession();
-      const claims = session.tokens.idToken.payload;
-      const username = claims["custom:userID"] || "UnknownUser";
+      const idToken = session.tokens.idToken;
+      const claims = idToken.payload;
+      const username = claims["custom:userID"] || "User";
+      const user = await getCurrentUser();
 
+      // Prepare input for the joinRoom mutation
       const joinRoomInput = {
         roomId: roomCode,
         username: username,
         userId: user.username,
       };
 
-      const result = await client.mutate({
-        mutation: customJoinRoom,
+      // Call the joinRoom mutation using the generated client
+      const result = await client.graphql({
+        query: customJoinRoom,
         variables: { input: joinRoomInput },
       });
 
-      console.log("Successfully joined room:", result.data.joinRoom);
-      navigate(`/room/${roomCode}`);
+      console.log("Mutation result:", result.data.customJoinRoom);
+      navigate(`/room/${result.data.customJoinRoom.id}`);
+      // setRoomData(result.data.customJoinRoom);
     } catch (error) {
-      console.error("Error joining room:", error);
-      setErrorMessage(
-        error.message || "An error occurred while joining the room."
-      );
+      console.error("❌ Error fetching room data:", error);
+      setErrorMessage(error.message);
     }
   };
 
