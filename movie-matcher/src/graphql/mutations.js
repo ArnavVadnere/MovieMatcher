@@ -19,9 +19,9 @@ export const customCreateRoom = /* GraphQL */ `
     }
   }
 `;
-export const joinRoom = /* GraphQL */ `
-  mutation JoinRoom($input: JoinRoomInput!) {
-    joinRoom(input: $input) {
+export const customJoinRoom = /* GraphQL */ `
+  mutation CustomJoinRoom($input: CustomJoinRoomInput!) {
+    customJoinRoom(input: $input) {
       id
       hostId
       hostUsername

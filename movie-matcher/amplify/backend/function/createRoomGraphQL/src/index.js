@@ -48,7 +48,7 @@ exports.handler = async (event) => {
       maxUsers,
       genreFilter,
       streamingService,
-      members: [[hostId, hostUsername]], // Add the host as a member tuple
+      members: [{ userId: hostId, username: hostUsername }], // Add the host as a member object
       roomCode: roomCode,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

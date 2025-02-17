@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { generateClient } from "aws-amplify/api";
 import { getCurrentUser, fetchAuthSession } from "@aws-amplify/auth";
 import Header from "../components/Header";
-
-const API_BASE_URL =
-  "https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/joinRoom-dev";
+import { customJoinRoom } from "../graphql/mutations";
 
 const LandingPage = () => {
+  const client = generateClient();
   const [user, setUser] = useState(null);
   const [roomCode, setRoomCode] = useState(""); // ✅ Capture room code input
   const [errorMessage, setErrorMessage] = useState(""); // ✅ Display errors if joining fails
@@ -27,7 +27,6 @@ const LandingPage = () => {
     checkUser();
   }, []);
 
-  // ✅ Function to handle joining a room
   const handleJoinRoom = async () => {
     if (!roomCode.trim()) {
       setErrorMessage("Please enter a valid room code.");
@@ -35,22 +34,25 @@ const LandingPage = () => {
     }
 
     try {
-      const session = await fetchAuthSession(); // ✅ Fetch broader user session
-      const claims = session.tokens.idToken.payload; // ✅ Claims contain user attributes
+      const session = await fetchAuthSession();
+      const claims = session.tokens.idToken.payload;
       const username = claims["custom:userID"] || "UnknownUser";
-      const response = await fetch(
-        `${API_BASE_URL}?roomId=${roomCode}&username=${username}`
-      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to join room.");
-      }
+      const joinRoomInput = {
+        roomId: roomCode,
+        username: username,
+        userId: user.username,
+      };
 
-      console.log("✅ Successfully joined room:", roomCode);
-      navigate(`/room/${roomCode}`); // ✅ Redirect to room page
+      const result = await client.mutate({
+        mutation: customJoinRoom,
+        variables: { input: joinRoomInput },
+      });
+
+      console.log("Successfully joined room:", result.data.joinRoom);
+      navigate(`/room/${roomCode}`);
     } catch (error) {
-      console.error("❌ Error joining room:", error);
+      console.error("Error joining room:", error);
       setErrorMessage(
         error.message || "An error occurred while joining the room."
       );

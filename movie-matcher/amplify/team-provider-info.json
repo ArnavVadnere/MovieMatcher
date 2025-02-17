@@ -26,7 +26,11 @@
         },
         "createRoomGraphQL": {
           "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
-          "s3Key": "amplify-builds/createRoomGraphQL-54765868513157782b72-build.zip"
+          "s3Key": "amplify-builds/createRoomGraphQL-58516e654a6f324c5339-build.zip"
+        },
+        "joinRoomGraphQL": {
+          "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
+          "s3Key": "amplify-builds/joinRoomGraphQL-645969414f3642314b77-build.zip"
         }
       },
       "api": {

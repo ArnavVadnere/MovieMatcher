@@ -32,15 +32,17 @@ input CustomCreateRoomInput {
   createdAt: AWSDateTime
 }
 
-input JoinRoomInput {
+input CustomJoinRoomInput {
   roomId: ID!
   username: String!
+  userId: String!
 }
 
 type Mutation {
   customCreateRoom(input: CustomCreateRoomInput!): Room
     @function(name: "createRoomGraphQL-${env}")
-  joinRoom(input: JoinRoomInput!): Room
+  customJoinRoom(input: CustomJoinRoomInput!): Room
+    @function(name: "joinRoomGraphQL-${env}")
 }
 
 schema {

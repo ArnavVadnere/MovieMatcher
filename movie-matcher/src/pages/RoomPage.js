@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { API, graphqlOperation } from "aws-amplify";
 import Header from "../components/Header";
-import { fetchAuthSession } from "@aws-amplify/auth";
-import { createRoom } from "../graphql/mutations";
-
-const API_BASE_URL =
-  "https://8qtloqt9pc.execute-api.us-east-2.amazonaws.com/dev/joinRoom-dev";
+import { fetchAuthSession, getCurrentUser } from "@aws-amplify/auth";
+import { customJoinRoom } from "../graphql/mutations";
+import { generateClient } from "aws-amplify/api";
 
 const RoomsPage = () => {
   const { roomId } = useParams();
@@ -14,31 +11,31 @@ const RoomsPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    const client = generateClient();
+
     const fetchRoomData = async () => {
       try {
         const session = await fetchAuthSession();
         const idToken = session.tokens.idToken;
         const claims = idToken.payload;
         const username = claims["custom:userID"] || "User";
+        const user = await getCurrentUser();
 
-        const response = await fetch(
-          `${API_BASE_URL}?roomId=${roomId}&username=${username}`
-        );
-        console.log("Response status:", response.status);
+        // Prepare input for the joinRoom mutation
+        const joinRoomInput = {
+          roomId: roomId,
+          username: username,
+          userId: user.username,
+        };
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.log("Error data:", errorData);
-          throw new Error(errorData.error || "Failed to load room data.");
-        }
+        // Call the joinRoom mutation using the generated client
+        const result = await client.graphql({
+          query: customJoinRoom,
+          variables: { input: joinRoomInput },
+        });
 
-        const result = await response.json();
-        console.log("Raw result:", result);
-        // The API returns a JSON string in result.body; we need to parse it.
-        const data = JSON.parse(result.body);
-        console.log("Parsed data:", data);
-        // Set state to the inner roomData object instead of the entire response.
-        setRoomData(data.roomData);
+        console.log("Mutation result:", result.data.customJoinRoom);
+        setRoomData(result.data.customJoinRoom);
       } catch (error) {
         console.error("❌ Error fetching room data:", error);
         setErrorMessage(error.message);
@@ -67,7 +64,9 @@ const RoomsPage = () => {
               <h3 className="text-xl mb-2">Members:</h3>
               <ul>
                 {(roomData.members || []).map((member, index) => (
-                  <li key={index}>{member}</li>
+                  <li key={index}>
+                    {member.username ? member.username : member}
+                  </li>
                 ))}
               </ul>
               <h3 className="text-xl mb-2">
