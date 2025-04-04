@@ -1,42 +1,6 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const customCreateRoom = /* GraphQL */ `
-  mutation CustomCreateRoom($input: CustomCreateRoomInput!) {
-    customCreateRoom(input: $input) {
-      id
-      hostId
-      hostUsername
-      maxUsers
-      genreFilter
-      streamingService
-      members
-      roomCode
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
-export const customJoinRoom = /* GraphQL */ `
-  mutation CustomJoinRoom($input: CustomJoinRoomInput!) {
-    customJoinRoom(input: $input) {
-      id
-      hostId
-      hostUsername
-      maxUsers
-      genreFilter
-      streamingService
-      members
-      roomCode
-      createdAt
-      updatedAt
-      owner
-      __typename
-    }
-  }
-`;
 export const createRoom = /* GraphQL */ `
   mutation CreateRoom(
     $input: CreateRoomInput!
@@ -49,8 +13,12 @@ export const createRoom = /* GraphQL */ `
       maxUsers
       genreFilter
       streamingService
-      members
+      members {
+        nextToken
+        __typename
+      }
       roomCode
+      likedMovies
       createdAt
       updatedAt
       owner
@@ -70,8 +38,12 @@ export const updateRoom = /* GraphQL */ `
       maxUsers
       genreFilter
       streamingService
-      members
+      members {
+        nextToken
+        __typename
+      }
       roomCode
+      likedMovies
       createdAt
       updatedAt
       owner
@@ -91,8 +63,66 @@ export const deleteRoom = /* GraphQL */ `
       maxUsers
       genreFilter
       streamingService
-      members
+      members {
+        nextToken
+        __typename
+      }
       roomCode
+      likedMovies
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const createMember = /* GraphQL */ `
+  mutation CreateMember(
+    $input: CreateMemberInput!
+    $condition: ModelMemberConditionInput
+  ) {
+    createMember(input: $input, condition: $condition) {
+      id
+      roomId
+      userId
+      username
+      joinedAt
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const updateMember = /* GraphQL */ `
+  mutation UpdateMember(
+    $input: UpdateMemberInput!
+    $condition: ModelMemberConditionInput
+  ) {
+    updateMember(input: $input, condition: $condition) {
+      id
+      roomId
+      userId
+      username
+      joinedAt
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const deleteMember = /* GraphQL */ `
+  mutation DeleteMember(
+    $input: DeleteMemberInput!
+    $condition: ModelMemberConditionInput
+  ) {
+    deleteMember(input: $input, condition: $condition) {
+      id
+      roomId
+      userId
+      username
+      joinedAt
       createdAt
       updatedAt
       owner

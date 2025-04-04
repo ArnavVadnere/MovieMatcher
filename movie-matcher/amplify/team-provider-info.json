@@ -15,30 +15,11 @@
       "auth": {
         "moviematchera5c29dcc": {}
       },
-      "function": {
-        "createRoom": {
-          "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
-          "s3Key": "amplify-builds/createRoom-664d546762444b595430-build.zip"
-        },
-        "joinRoom": {
-          "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
-          "s3Key": "amplify-builds/joinRoom-48613261414b6c493653-build.zip"
-        },
-        "createRoomGraphQL": {
-          "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
-          "s3Key": "amplify-builds/createRoomGraphQL-58516e654a6f324c5339-build.zip"
-        },
-        "joinRoomGraphQL": {
-          "deploymentBucketName": "amplify-moviematcher-dev-afef5-deployment",
-          "s3Key": "amplify-builds/joinRoomGraphQL-645969414f3642314b77-build.zip"
-        }
-      },
-      "api": {
-        "movieMatcherAPI": {},
-        "movieMatcherGraphQL": {}
-      },
       "storage": {
         "movieMatcherStorage": {}
+      },
+      "api": {
+        "room": {}
       }
     }
   }

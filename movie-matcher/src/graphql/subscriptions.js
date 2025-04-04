@@ -13,8 +13,12 @@ export const onCreateRoom = /* GraphQL */ `
       maxUsers
       genreFilter
       streamingService
-      members
+      members {
+        nextToken
+        __typename
+      }
       roomCode
+      likedMovies
       createdAt
       updatedAt
       owner
@@ -34,8 +38,12 @@ export const onUpdateRoom = /* GraphQL */ `
       maxUsers
       genreFilter
       streamingService
-      members
+      members {
+        nextToken
+        __typename
+      }
       roomCode
+      likedMovies
       createdAt
       updatedAt
       owner
@@ -55,8 +63,66 @@ export const onDeleteRoom = /* GraphQL */ `
       maxUsers
       genreFilter
       streamingService
-      members
+      members {
+        nextToken
+        __typename
+      }
       roomCode
+      likedMovies
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const onCreateMember = /* GraphQL */ `
+  subscription OnCreateMember(
+    $filter: ModelSubscriptionMemberFilterInput
+    $owner: String
+  ) {
+    onCreateMember(filter: $filter, owner: $owner) {
+      id
+      roomId
+      userId
+      username
+      joinedAt
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const onUpdateMember = /* GraphQL */ `
+  subscription OnUpdateMember(
+    $filter: ModelSubscriptionMemberFilterInput
+    $owner: String
+  ) {
+    onUpdateMember(filter: $filter, owner: $owner) {
+      id
+      roomId
+      userId
+      username
+      joinedAt
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const onDeleteMember = /* GraphQL */ `
+  subscription OnDeleteMember(
+    $filter: ModelSubscriptionMemberFilterInput
+    $owner: String
+  ) {
+    onDeleteMember(filter: $filter, owner: $owner) {
+      id
+      roomId
+      userId
+      username
+      joinedAt
       createdAt
       updatedAt
       owner

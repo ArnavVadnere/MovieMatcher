@@ -1,0 +1,29 @@
+type Room
+  @model
+  @auth(
+    rules: [{ allow: owner }, { allow: private, operations: [read, update] }]
+  ) {
+  id: ID!
+  hostId: String!
+  hostUsername: String!
+  maxUsers: Int!
+  genreFilter: [String]
+  streamingService: String
+  members: [Member] @hasMany(indexName: "byRoom", fields: ["id"])
+  roomCode: String
+  likedMovies: [String]
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Member
+  @model
+  @auth(
+    rules: [{ allow: owner }, { allow: private, operations: [read, create] }]
+  ) {
+  id: ID!
+  roomId: ID! @index(name: "byRoom")
+  userId: String!
+  username: String!
+  joinedAt: AWSDateTime
+}

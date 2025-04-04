@@ -4,7 +4,17 @@ import { generateClient } from "aws-amplify/api";
 import Header from "../components/Header";
 import { getCurrentUser, fetchAuthSession } from "@aws-amplify/auth";
 import { GENRES, STREAMING_SERVICES } from "../constants";
-import { customCreateRoom } from "../graphql/mutations"; // Import the GraphQL mutation
+import { createRoom } from "../graphql/mutations";
+
+// Generate short room ID like "ABCD"
+const generateRoomCode = (length = 4) => {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for (let i = 0; i < length; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
 
 const HomePage = () => {
   const client = generateClient();
@@ -18,37 +28,33 @@ const HomePage = () => {
 
   const handleCreateRoom = async () => {
     setErrorMessage("");
-    const user = await getCurrentUser();
 
     try {
+      const user = await getCurrentUser();
       const session = await fetchAuthSession();
       const claims = session.tokens.idToken.payload;
       const username = claims["custom:userID"] || "UnknownUser";
 
-      const input = {
-        ...roomSettings,
-        userId: user.username,
-        username: username,
-      };
+      const roomCode = generateRoomCode();
 
       const response = await client.graphql({
-        query: customCreateRoom,
+        query: createRoom,
         variables: {
           input: {
+            id: roomCode, // use short code as ID
             hostUsername: username,
             hostId: user.username,
-            maxUsers: roomSettings.maxUsers,
+            maxUsers: parseInt(roomSettings.maxUsers),
             genreFilter: roomSettings.genreFilter,
             streamingService: roomSettings.streamingService,
           },
         },
       });
 
-      const data = response.data.customCreateRoom;
+      const data = response.data.createRoom;
       console.log("Room Created:", data);
       navigate(`/room/${data.id}`);
     } catch (error) {
-      console.log(error);
       console.error("Error creating room:", error);
       setErrorMessage(error.message || "An unexpected error occurred.");
     }
@@ -93,18 +99,17 @@ const HomePage = () => {
                   <input
                     type="checkbox"
                     value={genre}
-                    onChange={(e) => {
-                      const selectedGenres = roomSettings.genreFilter.includes(
-                        genre
-                      )
+                    onChange={() => {
+                      const selected = roomSettings.genreFilter.includes(genre)
                         ? roomSettings.genreFilter.filter((g) => g !== genre)
                         : [...roomSettings.genreFilter, genre];
                       setRoomSettings({
                         ...roomSettings,
-                        genreFilter: selectedGenres,
+                        genreFilter: selected,
                       });
                     }}
                     className="mr-2"
+                    checked={roomSettings.genreFilter.includes(genre)}
                   />
                   {genre}
                 </label>

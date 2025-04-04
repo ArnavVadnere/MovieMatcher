@@ -3,16 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { generateClient } from "aws-amplify/api";
 import { getCurrentUser, fetchAuthSession } from "@aws-amplify/auth";
 import Header from "../components/Header";
-import { customJoinRoom } from "../graphql/mutations";
+import { getRoom } from "../graphql/queries";
+import { createMember } from "../graphql/mutations";
 
 const LandingPage = () => {
   const client = generateClient();
   const [user, setUser] = useState(null);
-  const [roomCode, setRoomCode] = useState(""); // ✅ Capture room code input
-  const [errorMessage, setErrorMessage] = useState(""); // ✅ Display errors if joining fails
+  const [roomCode, setRoomCode] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  // ✅ Check if user is logged in
+  // Check if user is logged in
   useEffect(() => {
     const checkUser = async () => {
       try {
@@ -34,31 +35,43 @@ const LandingPage = () => {
     }
 
     try {
-      const session = await fetchAuthSession();
-      const idToken = session.tokens.idToken;
-      const claims = idToken.payload;
-      const username = claims["custom:userID"] || "User";
-      const user = await getCurrentUser();
-
-      // Prepare input for the joinRoom mutation
-      const joinRoomInput = {
-        roomId: roomCode,
-        username: username,
-        userId: user.username,
-      };
-
-      // Call the joinRoom mutation using the generated client
-      const result = await client.graphql({
-        query: customJoinRoom,
-        variables: { input: joinRoomInput },
+      // Step 1: Check if the room exists
+      const roomResponse = await client.graphql({
+        query: getRoom,
+        variables: { id: roomCode },
       });
 
-      console.log("Mutation result:", result.data.customJoinRoom);
-      navigate(`/room/${result.data.customJoinRoom.id}`);
-      // setRoomData(result.data.customJoinRoom);
+      const room = roomResponse.data.getRoom;
+      if (!room) {
+        setErrorMessage("Room not found.");
+        return;
+      }
+
+      // Step 2: Add user as a member of the room
+      const session = await fetchAuthSession();
+      const claims = session.tokens.idToken.payload;
+      const username = claims["custom:userID"] || "User";
+      const currentUser = await getCurrentUser();
+
+      await client.graphql({
+        query: createMember,
+        variables: {
+          input: {
+            roomId: roomCode,
+            username: username,
+            userId: currentUser.username,
+            joinedAt: new Date().toISOString(),
+          },
+        },
+      });
+
+      console.log("✅ Joined room successfully:", roomCode);
+      navigate(`/room/${roomCode}`);
     } catch (error) {
-      console.error("❌ Error fetching room data:", error);
-      setErrorMessage(error.message);
+      console.error("❌ Error joining room:", error);
+      setErrorMessage(
+        error.errors?.[0]?.message || "An unexpected error occurred."
+      );
     }
   };
 
@@ -72,7 +85,6 @@ const LandingPage = () => {
       </div>
 
       {user ? (
-        // ✅ Show "Join Room" and "Create Room" options if user is logged in
         <div className="w-full max-w-screen-sm bg-white bg-opacity-10 rounded-lg p-8 shadow-lg text-center">
           <h3 className="text-xl mb-4">Join Room</h3>
           <input
@@ -89,8 +101,9 @@ const LandingPage = () => {
             Join
           </button>
 
-          {/* ❌ Display error message if joining fails */}
-          {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
+          {errorMessage && (
+            <p className="text-red-500 font-bold mt-2">{errorMessage}</p>
+          )}
 
           <h3 className="text-xl mb-4">Or</h3>
           <button
@@ -101,7 +114,6 @@ const LandingPage = () => {
           </button>
         </div>
       ) : (
-        // ❌ Show "Login or Signup" message if user is NOT logged in
         <div className="w-full max-w-screen-sm bg-white bg-opacity-10 rounded-lg p-8 shadow-lg text-center">
           <p className="text-lg mb-6">
             You must log in or sign up to access the app!

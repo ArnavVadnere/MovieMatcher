@@ -10,8 +10,12 @@ export const getRoom = /* GraphQL */ `
       maxUsers
       genreFilter
       streamingService
-      members
+      members {
+        nextToken
+        __typename
+      }
       roomCode
+      likedMovies
       createdAt
       updatedAt
       owner
@@ -33,8 +37,77 @@ export const listRooms = /* GraphQL */ `
         maxUsers
         genreFilter
         streamingService
-        members
         roomCode
+        likedMovies
+        createdAt
+        updatedAt
+        owner
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getMember = /* GraphQL */ `
+  query GetMember($id: ID!) {
+    getMember(id: $id) {
+      id
+      roomId
+      userId
+      username
+      joinedAt
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const listMembers = /* GraphQL */ `
+  query ListMembers(
+    $filter: ModelMemberFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listMembers(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        roomId
+        userId
+        username
+        joinedAt
+        createdAt
+        updatedAt
+        owner
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const membersByRoomId = /* GraphQL */ `
+  query MembersByRoomId(
+    $roomId: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelMemberFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    membersByRoomId(
+      roomId: $roomId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        roomId
+        userId
+        username
+        joinedAt
         createdAt
         updatedAt
         owner

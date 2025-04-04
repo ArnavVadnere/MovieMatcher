@@ -1,28 +1,6 @@
 {
   "api": {
-    "movieMatcherAPI": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "createRoom"
-        },
-        {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "joinRoom"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "API Gateway"
-    },
-    "movieMatcherGraphQL": {
+    "room": {
       "dependsOn": [
         {
           "attributes": [
@@ -34,7 +12,16 @@
       ],
       "output": {
         "authConfig": {
-          "additionalAuthenticationProviders": [],
+          "additionalAuthenticationProviders": [
+            {
+              "apiKeyConfig": {
+                "apiKeyExpirationDate": "2026-04-04T06:03:51.720Z",
+                "apiKeyExpirationDays": 365,
+                "description": ""
+              },
+              "authenticationType": "API_KEY"
+            }
+          ],
           "defaultAuthentication": {
             "authenticationType": "AMAZON_COGNITO_USER_POOLS",
             "userPoolConfig": {
@@ -75,97 +62,7 @@
       "service": "Cognito"
     }
   },
-  "function": {
-    "createRoom": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "createRoomGraphQL": {
-      "build": true,
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "joinRoom": {
-      "build": true,
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "joinRoomGraphQL": {
-      "build": true,
-      "dependsOn": [],
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    }
-  },
-  "parameters": {
-    "AMPLIFY_function_createRoomGraphQL_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "createRoomGraphQL"
-        }
-      ]
-    },
-    "AMPLIFY_function_createRoomGraphQL_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "createRoomGraphQL"
-        }
-      ]
-    },
-    "AMPLIFY_function_createRoom_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "createRoom"
-        }
-      ]
-    },
-    "AMPLIFY_function_createRoom_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "createRoom"
-        }
-      ]
-    },
-    "AMPLIFY_function_joinRoomGraphQL_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "joinRoomGraphQL"
-        }
-      ]
-    },
-    "AMPLIFY_function_joinRoomGraphQL_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "joinRoomGraphQL"
-        }
-      ]
-    },
-    "AMPLIFY_function_joinRoom_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "joinRoom"
-        }
-      ]
-    },
-    "AMPLIFY_function_joinRoom_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "joinRoom"
-        }
-      ]
-    }
-  },
+  "function": {},
   "storage": {
     "movieMatcherStorage": {
       "providerPlugin": "awscloudformation",
