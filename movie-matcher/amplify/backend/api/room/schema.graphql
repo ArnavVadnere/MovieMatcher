@@ -10,6 +10,8 @@ type Room
   genreFilter: [String]
   streamingService: String
   members: [Member] @hasMany(indexName: "byRoom", fields: ["id"])
+  selectionStarted: Boolean
+  selectedMovie: String
   roomCode: String
   likedMovies: [String]
   createdAt: AWSDateTime
@@ -26,4 +28,12 @@ type Member
   userId: String!
   username: String!
   joinedAt: AWSDateTime
+}
+
+type MovieVote @model @key(name: "byRoom", fields: ["roomId"]) {
+  id: ID!
+  roomId: ID!
+  userId: String!
+  movieId: String!
+  voteType: String! # "like", "skip", "watched"
 }

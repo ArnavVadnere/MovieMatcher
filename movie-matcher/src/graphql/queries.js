@@ -14,6 +14,7 @@ export const getRoom = /* GraphQL */ `
         nextToken
         __typename
       }
+      selectionStarted
       roomCode
       likedMovies
       createdAt
@@ -37,6 +38,7 @@ export const listRooms = /* GraphQL */ `
         maxUsers
         genreFilter
         streamingService
+        selectionStarted
         roomCode
         likedMovies
         createdAt
@@ -80,6 +82,42 @@ export const listMembers = /* GraphQL */ `
         createdAt
         updatedAt
         owner
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getVote = /* GraphQL */ `
+  query GetVote($id: ID!) {
+    getVote(id: $id) {
+      id
+      movieId
+      roomId
+      userId
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listVotes = /* GraphQL */ `
+  query ListVotes(
+    $filter: ModelVoteFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listVotes(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        movieId
+        roomId
+        userId
+        status
+        createdAt
+        updatedAt
         __typename
       }
       nextToken

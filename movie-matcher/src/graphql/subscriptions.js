@@ -17,6 +17,7 @@ export const onCreateRoom = /* GraphQL */ `
         nextToken
         __typename
       }
+      selectionStarted
       roomCode
       likedMovies
       createdAt
@@ -42,6 +43,7 @@ export const onUpdateRoom = /* GraphQL */ `
         nextToken
         __typename
       }
+      selectionStarted
       roomCode
       likedMovies
       createdAt
@@ -67,6 +69,7 @@ export const onDeleteRoom = /* GraphQL */ `
         nextToken
         __typename
       }
+      selectionStarted
       roomCode
       likedMovies
       createdAt
@@ -126,6 +129,48 @@ export const onDeleteMember = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+      __typename
+    }
+  }
+`;
+export const onCreateVote = /* GraphQL */ `
+  subscription OnCreateVote($filter: ModelSubscriptionVoteFilterInput) {
+    onCreateVote(filter: $filter) {
+      id
+      movieId
+      roomId
+      userId
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateVote = /* GraphQL */ `
+  subscription OnUpdateVote($filter: ModelSubscriptionVoteFilterInput) {
+    onUpdateVote(filter: $filter) {
+      id
+      movieId
+      roomId
+      userId
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteVote = /* GraphQL */ `
+  subscription OnDeleteVote($filter: ModelSubscriptionVoteFilterInput) {
+    onDeleteVote(filter: $filter) {
+      id
+      movieId
+      roomId
+      userId
+      status
+      createdAt
+      updatedAt
       __typename
     }
   }

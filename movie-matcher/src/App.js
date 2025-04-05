@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import "./index.css";
 import LandingPage from "./pages/LandingPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -9,9 +14,9 @@ import CreateRoomPage from "./pages/CreateRoomPage";
 import JoinRoomPage from "./pages/JoinRoomPage";
 import RoomPage from "./pages/RoomPage";
 import PreferencesPage from "./pages/PreferencesPage";
-import RecommendationsPage from "./pages/RecommendationsPage";
 import UserMenu from "./components/UserMenu";
-import ProtectedRoute from "./components/ProtectedRouters"; 
+import ProtectedRoute from "./components/ProtectedRouters";
+import SelectionPage from "./pages/SelectionPage";
 
 import awsExports from "./aws-exports";
 import { Amplify } from "aws-amplify";
@@ -28,7 +33,8 @@ function App() {
 // ✅ Hide UserMenu on Login and Sign-Up Pages
 function MainLayout() {
   const location = useLocation();
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+  const isAuthPage =
+    location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <div className="relative min-h-screen">
@@ -85,10 +91,10 @@ function MainLayout() {
           }
         />
         <Route
-          path="/recommendations"
+          path="/room/:roomId/select"
           element={
             <ProtectedRoute>
-              <RecommendationsPage />
+              <SelectionPage />
             </ProtectedRoute>
           }
         />

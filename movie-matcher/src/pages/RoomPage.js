@@ -1,33 +1,60 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import { getRoom } from "../graphql/queries";
-import { onCreateMember } from "../graphql/subscriptions";
+import { getCurrentUser } from "@aws-amplify/auth";
+import { getRoom, listMembers } from "../graphql/queries";
+import { deleteMember, createMember, updateRoom } from "../graphql/mutations";
+import { onCreateMember, onUpdateRoom } from "../graphql/subscriptions";
 import { generateClient } from "aws-amplify/api";
 
 const RoomsPage = () => {
   const { roomId } = useParams();
+  const navigate = useNavigate();
   const [roomData, setRoomData] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
   const [members, setMembers] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Fetch room data on load
+  // Fetch current user info
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUserId(user.username);
+      } catch (error) {
+        console.error("❌ Error getting current user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Fetch room + members
   useEffect(() => {
     const client = generateClient();
 
-    const fetchRoomData = async () => {
+    const fetchRoomAndMembers = async () => {
       try {
-        const result = await client.graphql({
+        const roomResult = await client.graphql({
           query: getRoom,
           variables: { id: roomId },
         });
 
-        const room = result.data.getRoom;
+        const room = roomResult.data.getRoom;
         setRoomData(room);
 
-        if (room.members?.items) {
-          setMembers(room.members.items);
-        }
+        const membersResult = await client.graphql({
+          query: listMembers,
+          variables: {
+            filter: {
+              roomId: { eq: roomId },
+            },
+          },
+        });
+
+        const uniqueMembers = dedupeMembers(
+          membersResult.data.listMembers.items
+        );
+        setMembers(uniqueMembers);
       } catch (error) {
         console.error("❌ Error fetching room data:", error);
         setErrorMessage(error.errors?.[0]?.message || "Failed to load room.");
@@ -35,43 +62,128 @@ const RoomsPage = () => {
     };
 
     if (roomId) {
-      fetchRoomData();
+      fetchRoomAndMembers();
     }
   }, [roomId]);
 
-  // Subscribe to new member creation for this room
+  // Subscribe to member creation (avoid duplicates)
   useEffect(() => {
     if (!roomId) return;
-
     const client = generateClient();
 
-    console.log("Subscribing to member creation events...");
-    const subscription = client
-      .graphql({
-        query: onCreateMember,
-      })
-      .subscribe({
-        next: ({ data }) => {
-          const newMember = data?.onCreateMember;
-          if (!newMember || newMember.roomId !== roomId) return;
+    const subscription = client.graphql({ query: onCreateMember }).subscribe({
+      next: ({ data }) => {
+        const newMember = data?.onCreateMember;
+        if (!newMember || newMember.roomId !== roomId) return;
 
-          console.log("🟢 New member joined:", newMember);
+        setMembers((prev) => {
+          const exists = prev.some((m) => m.userId === newMember.userId);
+          return exists ? prev : [...prev, newMember];
+        });
+      },
+      error: (err) => console.warn("⚠️ Subscription error:", err),
+    });
 
-          setMembers((prev) => {
-            if (prev.some((m) => m.userId === newMember.userId)) return prev;
-            return [...prev, newMember];
-          });
-        },
-        error: (error) => {
-          console.warn("⚠️ Subscription error:", error);
+    return () => subscription.unsubscribe();
+  }, [roomId]);
+
+  // Subscribe to selection start
+  useEffect(() => {
+    const client = generateClient();
+    const subscription = client.graphql({ query: onUpdateRoom }).subscribe({
+      next: ({ data }) => {
+        const updatedRoom = data?.onUpdateRoom;
+        if (updatedRoom?.id === roomId && updatedRoom.selectionStarted) {
+          navigate(`/room/${roomId}/select`);
+        }
+      },
+      error: (err) => {
+        console.warn("⚠️ Room update subscription error:", err);
+      },
+    });
+
+    return () => subscription.unsubscribe();
+  }, [roomId]);
+
+  // Only create current member if not already exists
+  useEffect(() => {
+    const createSelfMember = async () => {
+      if (
+        !roomData ||
+        !currentUserId ||
+        members.some((m) => m.userId === currentUserId)
+      )
+        return;
+
+      const user = await getCurrentUser();
+      const client = generateClient();
+
+      try {
+        await client.graphql({
+          query: createMember,
+          variables: {
+            input: {
+              roomId,
+              userId: user.username,
+              username: user.signInDetails?.loginId || "User",
+            },
+          },
+        });
+
+        console.log("✅ Created member record for self");
+      } catch (err) {
+        console.error("❌ Error creating self member:", err);
+      }
+    };
+
+    createSelfMember();
+  }, [roomData, currentUserId, members, roomId]);
+
+  const isHost = roomData?.hostId === currentUserId;
+
+  const handleRemoveMember = async (memberId) => {
+    try {
+      const client = generateClient();
+      await client.graphql({
+        query: deleteMember,
+        variables: {
+          input: { id: memberId },
         },
       });
 
-    return () => {
-      console.log("Unsubscribing from member updates...");
-      subscription.unsubscribe();
-    };
-  }, [roomId]);
+      setMembers((prev) => prev.filter((m) => m.id !== memberId));
+    } catch (error) {
+      console.error("❌ Error removing member:", error);
+    }
+  };
+
+  const handleStartSelection = async () => {
+    const client = generateClient();
+    try {
+      await client.graphql({
+        query: updateRoom,
+        variables: {
+          input: {
+            id: roomId,
+            selectionStarted: true,
+          },
+        },
+      });
+
+      console.log("✅ Selection started for all users");
+    } catch (err) {
+      console.error("❌ Error starting selection:", err);
+    }
+  };
+
+  const dedupeMembers = (arr) => {
+    const seen = new Set();
+    return arr.filter((m) => {
+      if (seen.has(m.userId)) return false;
+      seen.add(m.userId);
+      return true;
+    });
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-900 to-indigo-800 text-white">
@@ -94,19 +206,29 @@ const RoomsPage = () => {
               <h2 className="text-2xl font-semibold">Members</h2>
               <ul className="pl-5 space-y-2">
                 {members.length > 0 ? (
-                  members.map((member, index) => (
+                  members.map((member) => (
                     <li
-                      key={index}
-                      className="flex items-center space-x-2 bg-white bg-opacity-5 rounded-lg p-3 transition-all hover:bg-opacity-10"
+                      key={member.id}
+                      className="flex items-center justify-between bg-white bg-opacity-5 rounded-lg p-3"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                        {member.username
-                          ? member.username.charAt(0).toUpperCase()
-                          : "?"}
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                          {member.username
+                            ? member.username.charAt(0).toUpperCase()
+                            : "?"}
+                        </div>
+                        <span className="text-lg">
+                          {member.username || member.userId}
+                        </span>
                       </div>
-                      <span className="text-lg">
-                        {member.username || member.userId}
-                      </span>
+                      {isHost && member.userId !== currentUserId && (
+                        <button
+                          onClick={() => handleRemoveMember(member.id)}
+                          className="text-red-400 hover:text-red-600 text-sm font-medium"
+                        >
+                          Remove
+                        </button>
+                      )}
                     </li>
                   ))
                 ) : (
@@ -130,6 +252,16 @@ const RoomsPage = () => {
                 {roomData.streamingService || "No streaming service available"}
               </p>
             </div>
+            {isHost && (
+              <div className="pt-4">
+                <button
+                  onClick={handleStartSelection}
+                  className="w-full py-3 mt-4 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded-lg shadow-md transition duration-300"
+                >
+                  Start Selection
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="flex justify-center py-6">

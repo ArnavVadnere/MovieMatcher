@@ -17,6 +17,7 @@ export const createRoom = /* GraphQL */ `
         nextToken
         __typename
       }
+      selectionStarted
       roomCode
       likedMovies
       createdAt
@@ -42,6 +43,7 @@ export const updateRoom = /* GraphQL */ `
         nextToken
         __typename
       }
+      selectionStarted
       roomCode
       likedMovies
       createdAt
@@ -67,6 +69,7 @@ export const deleteRoom = /* GraphQL */ `
         nextToken
         __typename
       }
+      selectionStarted
       roomCode
       likedMovies
       createdAt
@@ -126,6 +129,57 @@ export const deleteMember = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+      __typename
+    }
+  }
+`;
+export const createVote = /* GraphQL */ `
+  mutation CreateVote(
+    $input: CreateVoteInput!
+    $condition: ModelVoteConditionInput
+  ) {
+    createVote(input: $input, condition: $condition) {
+      id
+      movieId
+      roomId
+      userId
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateVote = /* GraphQL */ `
+  mutation UpdateVote(
+    $input: UpdateVoteInput!
+    $condition: ModelVoteConditionInput
+  ) {
+    updateVote(input: $input, condition: $condition) {
+      id
+      movieId
+      roomId
+      userId
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteVote = /* GraphQL */ `
+  mutation DeleteVote(
+    $input: DeleteVoteInput!
+    $condition: ModelVoteConditionInput
+  ) {
+    deleteVote(input: $input, condition: $condition) {
+      id
+      movieId
+      roomId
+      userId
+      status
+      createdAt
+      updatedAt
       __typename
     }
   }
